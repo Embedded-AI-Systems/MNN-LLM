@@ -62,7 +62,34 @@ int readProcStatus(MemoryInfo *mem_info) {
 
     return 0;
 }
-#endif // linux
+
+#else // linux
+
+#if defined(_WIN32) || defined(_WIN64)
+
+#include <processthreadsapi.h>
+#include <psapi.h>
+
+int readMemInfo(MemoryInfo *mem_info) {}
+
+int readProcStatus(MemoryInfo *mem_info) {
+    HANDLE hProcess = GetCurrentProcess();
+    PROCESS_MEMORY_COUNTERS pmc;
+
+    GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc));
+
+    mem_info->process_resident_set_size = (float)pmc.WorkingSetSize*BYTE_TO_MEGA;
+}
+
+#else // windows
+
+// do nothing
+int readMemInfo(MemoryInfo *mem_info) {}
+int readProcStatus(MemoryInfo *mem_info) {}
+
+#endif 
+
+#endif 
 
 void printMemoryInfo(const MemoryInfo *mem_info) {
     printf("Total Physical Memory:     %f MB\n", mem_info->total_phys_mem);

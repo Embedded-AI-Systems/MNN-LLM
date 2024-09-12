@@ -104,7 +104,7 @@ public:
     void setTensor(int tId, Tensor* tensor, int bytes);
     void setTensorSize(int tId, int tensor_size);
     void resetTensorShape(std::vector<std::vector<int>>& shape, int hP);
-    size_t setTensors(std::vector<std::vector<int>>& shape, void* backend, MNNStateCacheQuantType type, BackendConfig::PrecisionMode precision, int hP);
+    size_t setTensors(std::vector<std::vector<int>>& shape, void* backend, MNNStateCacheQuantType type, BackendConfig::PrecisionMode precision, int hP, int bytes);
     Tensor* getTensor(int tId) {
         return mTensors[tId];
     }
@@ -285,7 +285,7 @@ public:
     std::shared_ptr<StateCacheBlock> copyBlock(int ref_id, std::shared_ptr<StateCacheBlock> block_ptr, const std::vector<std::shared_ptr<StateCacheBlock>>& pin_block_list);
 
     // external calls
-    void onAllocateCache(void* layer, void* backend, int token_num, std::vector<std::vector<int>> shape, int hP);
+    void onAllocateCache(void* layer, void* backend, int token_num, std::vector<std::vector<int>> shape, int hP, int bytes);
     int prepareAttn(void* layer, int previous_token_num, std::vector<std::shared_ptr<StateCacheBlock>>& pastKV);
     void postAttn(void* layer, int last_block_slot_num); 
 

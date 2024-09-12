@@ -56,9 +56,10 @@ void StateCacheBlock::initTensorInfo(int tensor_num){
     mTensorBytes.resize(tensor_num);
     mTensorSeqLenDim.resize(tensor_num);
 }
-size_t StateCacheBlock::setTensors(std::vector<std::vector<int>>& shape, void* backend, MNNStateCacheQuantType type, BackendConfig::PrecisionMode precision, int hP) {
+size_t StateCacheBlock::setTensors(std::vector<std::vector<int>>& shape, void* backend, MNNStateCacheQuantType type, BackendConfig::PrecisionMode precision, int hP, int bytes) {
     resetTensorShape(shape, hP);
-    if (precision == BackendConfig::Precision_Low || precision == BackendConfig::Precision_Low_BF16){
+    if ((precision == BackendConfig::Precision_Low || precision == BackendConfig::Precision_Low_BF16) \
+        && bytes == 2){
         if (type == MNNStateCacheQuantType::NoQuant) {
             setTensor((int)LAYOUT::NoQuant::PAST_K, Tensor::createDevice<FLOAT16_T>(shape[(int)LAYOUT::NoQuant::PAST_K]), sizeof(FLOAT16_T));
             setTensor((int)LAYOUT::NoQuant::PAST_V, Tensor::createDevice<FLOAT16_T>(shape[(int)LAYOUT::NoQuant::PAST_V]), sizeof(FLOAT16_T));
@@ -651,7 +652,7 @@ std::shared_ptr<StateCacheBlock> StateCacheManager::copyBlock(int ref_id, std::s
 }
 
 // The Operator requires an allocation
-void StateCacheManager::onAllocateCache(void* layer, void* backend, int token_num, std::vector<std::vector<int>> shape, int hP) {
+void StateCacheManager::onAllocateCache(void* layer, void* backend, int token_num, std::vector<std::vector<int>> shape, int hP, int bytes) {
     // 1. check if the layer is registered.
     if (mStateCache.count(layer)==0) {
         mStateCache[layer] = std::shared_ptr<StateCache>(new StateCache);
@@ -694,7 +695,7 @@ void StateCacheManager::onAllocateCache(void* layer, void* backend, int token_nu
     // allocate the pointers to the page table
     for (int i = 0; i < need_block; ++i) {
         StateCacheBlock* block = new StateCacheBlock({mCurrentReference->mRefId}, mBlockSize, 0);
-        size_t block_size = block->setTensors(shape, backend, mQuantType, FP_precision, hP);
+        size_t block_size = block->setTensors(shape, backend, mQuantType, FP_precision, hP, bytes);
         char* free_ptr = getFreePtr(layer, block_size);
         block->onAllocatePtr(free_ptr);
         block->setBlockMem(free_ptr, block_size);

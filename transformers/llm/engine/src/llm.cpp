@@ -291,9 +291,13 @@ VARP Llm::forward(const std::vector<int>& input_ids, bool prefill) {
         for (int i = 0; i < layer_nums; i++) {
             AUTOTIME;
             // std::cout << "layer " <<  i << std::endl;
+            auto st = std::chrono::system_clock::now();
             auto outputs = modules_[i]->onForward({hidden_states, attention_mask, position_ids, past_key_values_[i]});
             hidden_states = outputs[0];
             past_key_values_[i] = outputs[1];
+            auto et = std::chrono::system_clock::now();
+            auto time_us_ = std::chrono::duration_cast<std::chrono::microseconds>(et - st).count();
+            std::cout << "Layer time: " << time_us_/1000.f << " ms" << std::endl;
             // for (int k = 0; k < hidden_states->getInfo()->size; ++k) {
             //     std::cout << hidden_states->readMap<float>()[k] << " ";
             // }

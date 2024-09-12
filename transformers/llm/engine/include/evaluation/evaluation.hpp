@@ -21,6 +21,8 @@ namespace Transformer {
 #define GIGA_TO_KILLO (1024.f*1024.f)
 #define KILLO_TO_MEGA (1/1024.f)
 #define MEGA_TO_KILLO 1024.f
+#define BYTE_TO_MEGA (1/1024.f/1024.f)
+#define MEGA_TO_BYTE (1024.f*1024.f)
 
 struct PrefillTimePerformance {
     size_t prefill_prev_token_ = 0;

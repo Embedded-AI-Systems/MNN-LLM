@@ -1,33 +1,44 @@
-## StateCacheManager
+# Version 1
+## v1.0.1
 
-### Compilation
-#### compile for phone
+### 1. Compilation
+#### 1.1 compile for phone
 
 ```bash
-set ANDROID_NDK=D:\NDK\android-ndk-r26d
+# windows
+set ANDROID_NDK=D:\NDK\android-ndk
 cmake ../.. -DCMAKE_TOOLCHAIN_FILE=%ANDROID_NDK%/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="arm64-v8a" -DANDROID_STL=c++_static -DMNN_USE_LOGCAT=false -DCMAKE_CXX_STANDARD=17 -DMNN_USE_SYSTEM_LIB=OFF -DMNN_BUILD_BENCHMARK=ON -DMNN_USE_SSE=OFF -DMNN_SUPPORT_BF16=OFF -DMNN_BUILD_TEST=ON -DANDROID_NATIVE_API_LEVEL=android-21  -DMNN_BUILD_FOR_ANDROID_COMMAND=true -DNATIVE_LIBRARY_OUTPUT=. -DMNN_LOW_MEMORY=ON -DMNN_BUILD_LLM=ON -DMNN_SUPPORT_TRANSFORMER_FUSE=ON -DMNN_BUILD_SHARED_LIBS=ON
+# arm v82
+cmake ../.. -DCMAKE_TOOLCHAIN_FILE=%ANDROID_NDK%/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="arm64-v8a" -DANDROID_STL=c++_static -DMNN_USE_LOGCAT=false -DCMAKE_CXX_STANDARD=17 -DMNN_USE_SYSTEM_LIB=OFF -DMNN_BUILD_BENCHMARK=ON -DMNN_USE_SSE=OFF -DMNN_SUPPORT_BF16=OFF -DMNN_BUILD_TEST=ON -DANDROID_NATIVE_API_LEVEL=android-21  -DMNN_BUILD_FOR_ANDROID_COMMAND=true -DNATIVE_LIBRARY_OUTPUT=. -DMNN_LOW_MEMORY=ON -DMNN_BUILD_LLM=ON -DMNN_SUPPORT_TRANSFORMER_FUSE=ON -DMNN_BUILD_SHARED_LIBS=ON -DMNN_ARM82=ON
 
-export ANDROID_NDK=~/NDK/android-ndk-r27
+# linux
+export ANDROID_NDK=~/NDK/android-ndk
 cmake ../.. -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="arm64-v8a" -DANDROID_STL=c++_static -DMNN_USE_LOGCAT=false -DCMAKE_CXX_STANDARD=17 -DMNN_USE_SYSTEM_LIB=OFF -DMNN_BUILD_BENCHMARK=ON -DMNN_USE_SSE=OFF -DMNN_SUPPORT_BF16=OFF -DMNN_BUILD_TEST=ON -DANDROID_NATIVE_API_LEVEL=android-21  -DMNN_BUILD_FOR_ANDROID_COMMAND=true -DNATIVE_LIBRARY_OUTPUT=. -DMNN_LOW_MEMORY=ON -DMNN_BUILD_LLM=ON -DMNN_SUPPORT_TRANSFORMER_FUSE=ON -DMNN_BUILD_SHARED_LIBS=ON
-
+# arm v82
 cmake ../.. -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DANDROID_ABI="arm64-v8a" -DANDROID_STL=c++_static -DMNN_USE_LOGCAT=false -DCMAKE_CXX_STANDARD=17 -DMNN_USE_SYSTEM_LIB=OFF -DMNN_BUILD_BENCHMARK=ON -DMNN_USE_SSE=OFF -DMNN_SUPPORT_BF16=OFF -DMNN_BUILD_TEST=ON -DANDROID_NATIVE_API_LEVEL=android-21  -DMNN_BUILD_FOR_ANDROID_COMMAND=true -DNATIVE_LIBRARY_OUTPUT=. -DMNN_LOW_MEMORY=ON -DMNN_BUILD_LLM=ON -DMNN_SUPPORT_TRANSFORMER_FUSE=ON -DMNN_BUILD_SHARED_LIBS=ON -DMNN_ARM82=ON
 ```
 
-#### compile for pc
+#### 1.2 compile for pc
 LLM and TRANSFORMER_FUSE shall be set ON: `-DMNN_BUILD_LLM=ON -DMNN_SUPPORT_TRANSFORMER_FUSE=ON`
 
 ```bash
+mkdir build && mkdir build/pc && cd build/pc
+# linux
 cmake ../.. -DCMAKE_CXX_STANDARD=17 -DMNN_USE_SYSTEM_LIB=OFF -DMNN_BUILD_SHARED_LIBS=ON -DMNN_BUILD_TRAIN=ON -DMNN_BUILD_QUANTOOLS=ON -DMNN_EVALUATION=ON -DMNN_BUILD_CONVERTER=ON -DMNN_PORTABLE_BUILD=ON -DTFMODEL_OPTIMIZE=ON -DMNN_LOW_MEMORY=ON -DMNN_BUILD_LLM=ON -DMNN_SUPPORT_TRANSFORMER_FUSE=ON -DMNN_BUILD_TEST=ON
+# windows
+cmake ../.. -DCMAKE_CXX_STANDARD=17 -DMNN_USE_SYSTEM_LIB=OFF -DMNN_BUILD_SHARED_LIBS=ON -DMNN_BUILD_TRAIN=ON -DMNN_BUILD_QUANTOOLS=ON -DMNN_EVALUATION=ON -DMNN_BUILD_CONVERTER=ON -DMNN_PORTABLE_BUILD=ON -DTFMODEL_OPTIMIZE=ON -DMNN_LOW_MEMORY=ON -DMNN_BUILD_LLM=ON -DMNN_SUPPORT_TRANSFORMER_FUSE=ON -DMNN_BUILD_TEST=ON -DMNN_SEP_BUILD=ON
 make -j20
 
-./llm_demo /home/hzx/Desktop/ANL/Project/LLM/MNN-LLM/model/qwen1_5-4b-chat-mnn-f/llm_config.json
+./llm_demo ../../model/qwen1_5-4b-chat-mnn-f/llm_config.json
 ```
 
+### 2. Model Convertion
+
+#### 2.1 Direct Model Download
 Transformer path: 
 Download from https://github.com/wangzhaode/mnn-llm/releases
-`/home/hzx/Desktop/ANL/Project/LLM/MNN-LLM/model/qwen1_5-4b-chat-mnn-f/`
-`./llm_demo /home/hzx/Desktop/ANL/Project/LLM/MNN-LLM/model/qwen1_5-4b-chat-mnn-f/llm_config.json`
 
+#### 2.2 Model Export
 export
 ```bash
 cd transformers/llm/export/
@@ -38,8 +49,8 @@ python llm_export.py \
         --export_token \
         --export_mnn \
         --export_embed --embed_bin --embed_bf16 \
-        --onnx_path ../../../model/qwen1_5-4b-chat-onnx2 \
-        --mnn_path  ../../../model/qwen1_5-4b-chat-mnn2
+        --onnx_path ../../../model/qwen1_5-4b-chat-onnx \
+        --mnn_path  ../../../model/qwen1_5-4b-chat-mnn
 
 python llm_export.py \
         --path ../../../model/Qwen1_5-1_8B-Chat \
@@ -56,7 +67,7 @@ Currently fuse attention haven't added to python MNN package converter. To use i
 ```bash
 for i in $(seq 0 39)
 do
-    ./build/MNNConvert -f ONNX --modelFile ./model/qwen1_5-4b-chat-onnx/block_${i}.onnx --MNNModel ./model/qwen1_5-4b-chat-mnn-f/block_${i}.mnn --weightQuantBits 4 --weightQuantAsymmetric --transformerFuse
+    ./build/MNNConvert -f ONNX --modelFile ./model/qwen1_5-4b-chat-onnx/block_${i}.onnx --MNNModel ./model/qwen1_5-4b-chat-mnn/block_${i}.mnn --weightQuantBits 4 --weightQuantAsymmetric --transformerFuse
 done
 
 for i in $(seq 0 24)
@@ -66,11 +77,11 @@ done
 ```
 
 
-### Files
+### 3. StateCacheManager
 
-`core/StateCacheManager.hpp` and `core/StateCacheManager.cpp`
+Implemented in `core/StateCacheManager.hpp` and `core/StateCacheManager.cpp`.
 
-### Config
+#### 3.1 Config
 
 1. StateCacheType: implementation type of StateCacheManager
 2. StateCacheQuantType: quantization type of StateCacheManager
@@ -121,13 +132,14 @@ class MNN_PUBLIC StateCacheManager{
 };
 ```
 
-### Creation of StateCacheManager
+#### 3.2 Creation and Clone
 
 
 
-### Sampler
+### 4. Sampler
 
-#### sampler specification
+#### 4.1 sampler specification
+llama.cpp sampler support.
 sampling:
         repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
         top_k = 40, tfs_z = 1.000, top_p = 0.950, min_p = 0.050, typical_p = 1.000, temp = 0.800
@@ -135,14 +147,16 @@ sampling:
 sampling order:
 CFG -> Penalties -> top_k -> tfs_z -> typical_p -> top_p -> min_p -> temperature
 
-#### adding new sampler
+#### 4.2 sampler references
+
+#### 4.3 process of adding new sampler
 1. add hyperparameters to `llm_config.hpp`.
 2. add parsing selections to function `void Llm::initSampler()` in `llm.cpp`.
 3. add implementation in `sampler.hpp` and `sampler.cpp`.
 
-### Operator
+### 5. CPUAttention
 
-#### Matmul Layout v1.0
+#### 5.1 Matmul Layout v1.0
 
 Layerwise concatenation of all input blocks. Assume enough memory for activation buffer and enough memory for one layer's calculation.
 
@@ -237,3 +251,35 @@ char* qkv_buffer = QKVBuffer->host<char>() + tId * UP_DIV(mResource->mHeadDim, u
 mPackQKV.reset(Tensor::createDevice<float>({mThreadNum, UP_DIV(mResource->mHeadDim, unit), seq_len, unit}));
 auto pack_qkv    = mPackQKV->host<char>() + tId * UP_DIV(mResource->mHeadDim, unit) * seq_len * unit * bytes;
 ```
+
+#### 5.2 Speed Evaluation of CPUAttention
+
+1. test case 1
+Processor: HUAWEI Kirin 990 5G
+Mem: 8GB + 2GB Swap
+Model: Qwen1.5-4B-Chat
+Precision: attn-fp32, mlp-W4A8
+"type_kv": 1
+
+| Phase | prev_seq_len | seq_len | Layer time (ms) | Attention time (ms) | proportion|
+| :---: | :---: | :---: | :-----: | :----: | :---: |
+| prefill | 0 | 9 | 24.987 | 0.195 | 0.78% |
+| prefill | 0 | 18 | 33.978 | 0.333 | 0.98% |
+| decode | 10 | 1 | 4.261 | 0.058 | 1.4% |
+| decode | 20 | 1 | 4.187 | 0.086 | 2% |
+| decode | 60 | 1 | 4.019 | 0.147 | 3.6% |
+| decode | 64(malloc) | 1 | 4.005 | 0.222 | 5.5% |
+| decode | 80 | 1 | 4.062 | 0.207 | 5.1% |
+
+"type_kv": 0
+
+| Phase | prev_seq_len | seq_len | Layer time (ms) | Attention time (ms) | proportion|
+| :---: | :---: | :---: | :-----: | :----: | :---: |
+| prefill | 0 | 9 | 25.141 | 0.262 | 1.0% |
+| prefill | 0 | 18 | 33.742 | 0.394 | 1.2% |
+| decode | 10 | 1 | 4.093 | 0.064 | 1.6% |
+| decode | 20 | 1 | 4.163 | 0.073 | 1.75% |
+| decode | 60 | 1 | 4.141 | 0.101 | 2.4% |
+| decode | 80 | 1 | 4.131 | 0.11 | 2.7% |
+| decode | 89(malloc) | 1 | 6.382 | 1.42 | 22.2% |
+| decode | 110 | 1 | 4.101 | 0.167 | 4.0% |

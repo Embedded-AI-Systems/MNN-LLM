@@ -366,7 +366,7 @@ void CPUAttention::allocKVCache(int new_seq_len) {
     }
     StateCacheManager* manager = backend()->getStateCacheManager();
     std::vector<std::vector<int>> shape = getKVshape(manager->getQuantType());
-    manager->onAllocateCache(mIdentifier, backend(), new_seq_len, shape, hP);
+    manager->onAllocateCache(mIdentifier, backend(), new_seq_len, shape, hP, bytes);
 }
 
 ErrorCode CPUAttention::onResize(const std::vector<Tensor*>& inputs, const std::vector<Tensor*>& outputs) {
@@ -391,6 +391,7 @@ ErrorCode CPUAttention::onResize(const std::vector<Tensor*>& inputs, const std::
 }
 
 ErrorCode CPUAttention::onExecute(const std::vector<Tensor*>& inputs, const std::vector<Tensor*>& outputs) {
+    auto st = std::chrono::system_clock::now();
     auto core = static_cast<CPUBackend *>(backend())->functions();
     auto query = inputs[0];
     auto key   = inputs[1];
@@ -712,6 +713,9 @@ ErrorCode CPUAttention::onExecute(const std::vector<Tensor*>& inputs, const std:
         quantType == MNNStateCacheQuantType::QuantKeyInt8ValueFp8){
         backend()->onReleaseBuffer(dequantV.get(), Backend::STATIC);
     }
+    auto et = std::chrono::system_clock::now();
+    auto time_us_ = std::chrono::duration_cast<std::chrono::microseconds>(et - st).count();
+    std::cout << "Attention time: " << time_us_/1000.f << " ms" << std::endl;
     // std::vector<int> no;
     // std::cout << no[10] << std::endl;
     return NO_ERROR;
